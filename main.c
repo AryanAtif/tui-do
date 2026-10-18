@@ -43,29 +43,41 @@ int get_file_length()
 int read_file_by_lines ()
 {
   char ch;
-  int lines = 0;
   int file_len = get_file_length();
+  int lines = 0;
   int i = 0;
   while (i < file_len)
   {
     file_content = realloc(file_content, (lines + 1)*sizeof(char*));
     if (file_content == NULL) {fprintf (stderr, "ERR: Couldn't allocate memory to file_content: %d\n", errno); return 1;}
-
     int ch_count = 0;
-    while (ch != '\n')
+    while ((ch = fgetc(fp)) != '\n')
     {
-      ch = fgetc(fp);
       file_content[lines] = realloc(file_content[lines], (ch_count+1)*sizeof(char));
       if (file_content[lines] == NULL) {fprintf (stderr, "ERR: Couldn't allocate memory to file_content[%d]: %d\n", lines, errno); return 1;}
       file_content[lines][ch_count] = ch;
       ch_count++;
+      i++;
     }
-    lines++;
     i++;
+    lines++;
   }
   return 0;
 }
-
+int print_file ()
+{
+  if(read_file_by_lines()) return 1;
+  printf ("The file content: \n");
+  int file_len = get_file_length();
+  int lines = 0;
+  int i = 0;
+  while (i < file_len)
+  {
+    printf("%s\n", file_content[lines]);
+    i += strlen(file_content[lines]) + 1; // + 1 for each newline character
+    lines++;
+  }
+}
 
 void display_tui()
 {
@@ -74,7 +86,7 @@ void display_tui()
 
 int display_cli()
 {
-  if(read_file_by_lines()) return 1;
+  print_file();
   return 0;
 }
 int main(int argc, char** argv)
