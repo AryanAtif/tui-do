@@ -91,21 +91,41 @@ int display_cli()
   return print_file();
 }
 
+char* parse_tasks (int argc, char** argv)
+{
+	char* task = malloc (strlen(argv[2])*sizeof(char) + 1);
+	strcat(task, argv[2]);
+	if (task == NULL) fprintf(stderr, "Couldn't allocate memory\n");
+	for (int i = 3; i < argc; i++)
+	{
+		strcat(task, " ");
+		int memory = sizeof (task) + (strlen(argv[i]) * sizeof(char) + 1);
+		task = realloc(task, memory);
+		if (task == NULL) fprintf(stderr, "Couldn't allocate memory\n");
+		strcat(task, argv[i]);
+	}
+	strcat(task, "\n");
+	printf ("The complete task: %s\n", task);
+
+	return task;
+}
+
 void add_task (char* task)
 {
-	size_t bytes_written = fwrite(task, sizeof(char), strlen(task), fp);
+	int task_len = strlen(task);
+	size_t bytes_written = fwrite(task, sizeof(char), task_len, fp);
 	display_cli();
 	printf("\n%d characters written.\n", (bytes_written / sizeof(char)));
 }
 
 int main(int argc, char** argv)
 {
-  if (argc > 3 || (argc < 3 && argc != 1)) 
+ /* if ((argc < 3 && argc != 1)) 
   {
     if (argc < 3)  printf ("Too few arguments\n");
     else if (argc > 3)  printf ("Too many arguments\n");
     return 1;
-  }
+  }*/
 
   if (open_file() != 0) return 1;
 
@@ -116,13 +136,13 @@ int main(int argc, char** argv)
     // Display tasks on the console
     if (display_cli()) return 1;
   }
-  else if (argc == 3) // command -option file
+  else // command -option file
   {
-		printf ("argv1 = %s && argv2 == %s\n", argv[1], argv[2]);
 		if (*argv[1] == 'a' || argv[1] == "add")
 		{
 			printf ("Adding a new task...\n");
-			add_task(argv[2]);
+			char* task = parse_tasks(argc, argv);
+			add_task(task);
 		}
     // del ( task_number / task_string (case_insensitive));
     // edit ( task_number / task_string (case_insensitive));
