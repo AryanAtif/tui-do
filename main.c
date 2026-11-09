@@ -22,11 +22,11 @@ char* get_file_address()
   return file_addr;
 }
 
-int open_file()
+int open_file(char* open_mode)
 {
   char* file_addr = get_file_address();
   if (file_addr == NULL) return 1;
-  fp = fopen(file_addr, "a+");
+  fp = fopen(file_addr, open_mode);
   if (fp == NULL) {fprintf (stderr, "ERR: Couldn't open the file. (errno: %d)\n", errno); return errno;}
   return 0;
 }
@@ -112,6 +112,8 @@ char* parse_tasks (int argc, char** argv)
 
 void add_task (char* task)
 {
+  if (open_file("a+") != 0) return 1;
+
 	int task_len = strlen(task);
 	size_t bytes_written = fwrite(task, sizeof(char), task_len, fp);
 	display_cli();
@@ -127,8 +129,6 @@ int main(int argc, char** argv)
     return 1;
   }*/
 
-  if (open_file() != 0) return 1;
-
   if (argc == 1)
   {
     // Display all tasks on a tui -- will work on it later
@@ -136,7 +136,7 @@ int main(int argc, char** argv)
     // Display tasks on the console
     if (display_cli()) return 1;
   }
-  else // command -option file
+  else // command -option [args] 
   {
 		if (*argv[1] == 'a' || argv[1] == "add")
 		{
@@ -145,6 +145,12 @@ int main(int argc, char** argv)
 			add_task(task);
 		}
     // del ( task_number / task_string (case_insensitive));
+    else if (*argv[1] == 'd' || argv[1] == "delete")
+		{
+			printf ("Deleting task...\n");
+
+//			add_task(task);
+		}
     // edit ( task_number / task_string (case_insensitive));
   }
   return 0;
