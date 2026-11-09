@@ -3,7 +3,7 @@
 #include <string.h>
 #include <errno.h>
 #include <ncurses.h>
-
+	
 #define FILE_ADDR "/todo" // file named todo inside the $HOME dir
 
 FILE* fp = NULL;
@@ -48,6 +48,7 @@ int read_file_by_lines ()
   int i = 0;
   while (i < file_len)
   {
+		printf ("reading file...\n");
     file_content = realloc(file_content, (lines + 1)*sizeof(char*));
     if (file_content == NULL) {fprintf (stderr, "ERR: Couldn't allocate memory to file_content: %d\n", errno); return 1;}
     int ch_count = 0;
@@ -69,7 +70,8 @@ int print_file ()
   if(read_file_by_lines()) return 1;
   printf ("The file content: \n");
   int file_len = get_file_length();
-  int lines = 0;
+ 	printf ("The file length: %d\n"); 
+	int lines = 0;
   int i = 0;
   while (i < file_len)
   {
@@ -86,15 +88,22 @@ void display_tui()
 
 int display_cli()
 {
-  print_file();
-  return 0;
+  return print_file();
 }
+
+void add_task (char* task)
+{
+	size_t bytes_written = fwrite(task, sizeof(char), strlen(task), fp);
+	display_cli();
+	printf("\n%d characters written.\n", (bytes_written / sizeof(char)));
+}
+
 int main(int argc, char** argv)
 {
   if (argc > 3 || (argc < 3 && argc != 1)) 
   {
-    if (argc < 3)  printf ("Too few parameters\n");
-    else if (argc > 3)  printf ("Too many parameters\n");
+    if (argc < 3)  printf ("Too few arguments\n");
+    else if (argc > 3)  printf ("Too many arguments\n");
     return 1;
   }
 
@@ -109,7 +118,12 @@ int main(int argc, char** argv)
   }
   else if (argc == 3) // command -option file
   {
-    // add ();
+		printf ("argv1 = %s && argv2 == %s\n", argv[1], argv[2]);
+		if (*argv[1] == 'a' || argv[1] == "add")
+		{
+			printf ("Adding a new task...\n");
+			add_task(argv[2]);
+		}
     // del ( task_number / task_string (case_insensitive));
     // edit ( task_number / task_string (case_insensitive));
   }
