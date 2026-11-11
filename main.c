@@ -3,6 +3,8 @@
 #include <string.h>
 #include <errno.h>
 #include <ncurses.h>
+
+#include "buffer.h"
 	
 #define FILE_ADDR "/todo" // file named todo inside the $HOME dir
 
@@ -39,7 +41,7 @@ int get_file_length()
 
   return file_size;
 }
-
+/*
 int read_file_by_lines ()
 {
   char ch;
@@ -65,9 +67,10 @@ int read_file_by_lines ()
   }
   return 0;
 }
+*/
 int print_file ()
 {
-  if(read_file_by_lines()) return 1;
+  /*if(read_file_by_lines()) return 1;
   printf ("The file content: \n");
   int file_len = get_file_length();
  	printf ("The file length: %d\n"); 
@@ -79,6 +82,7 @@ int print_file ()
     i += strlen(file_content[lines]) + 1; // + 1 for each newline character
     lines++;
   }
+	return 0;*/
 }
 
 void display_tui()
